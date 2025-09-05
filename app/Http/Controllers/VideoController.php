@@ -222,8 +222,14 @@ class VideoController extends Controller
      */
     public function updateProgress(Request $request, Video $video): JsonResponse
     {
-        if ($video->user_id !== Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        // Allow users to track progress on videos uploaded by admins
+        if (Auth::user()->isAdmin()) {
+            // Admins can track progress on any video
+        } else {
+            // Regular users can only track progress on videos uploaded by admins
+            if (!in_array($video->user->role, ['admin', 'superadmin'])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
         }
 
         $validator = Validator::make($request->all(), [
@@ -263,8 +269,14 @@ class VideoController extends Controller
      */
     public function status(Video $video): JsonResponse
     {
-        if ($video->user_id !== Auth::id()) {
-            return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+        // Allow users to check status of videos uploaded by admins
+        if (Auth::user()->isAdmin()) {
+            // Admins can check status of any video
+        } else {
+            // Regular users can only check status of videos uploaded by admins
+            if (!in_array($video->user->role, ['admin', 'superadmin'])) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
         }
 
         return response()->json([
