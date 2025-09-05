@@ -26,10 +26,20 @@ class VideoController extends Controller
      */
     public function index()
     {
-        $videos = Auth::user()->videos()
-            ->with('progress')
-            ->orderBy('created_at', 'desc')
-            ->paginate(12);
+        if (Auth::user()->isAdmin()) {
+            // Admins see all videos
+            $videos = Video::with('progress', 'user')
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+        } else {
+            // Regular users see only videos uploaded by admins
+            $videos = Video::with('progress', 'user')
+                ->whereHas('user', function($query) {
+                    $query->whereIn('role', ['admin', 'superadmin']);
+                })
+                ->orderBy('created_at', 'desc')
+                ->paginate(12);
+        }
 
         return view('videos.index', compact('videos'));
     }

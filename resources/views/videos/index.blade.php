@@ -6,10 +6,14 @@
         <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold">My Videos</h2>
-                    <a href="{{ route('videos.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                        Upload Video
-                    </a>
+                    @if(auth()->user()->isAdmin())
+                        <h2 class="text-2xl font-bold">All Videos</h2>
+                        <a href="{{ route('admin.videos.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                            Upload Video
+                        </a>
+                    @else
+                        <h2 class="text-2xl font-bold">Available Videos</h2>
+                    @endif
                 </div>
 
                 @if($videos->count() > 0)
@@ -76,12 +80,15 @@
                                                 Watch
                                             </a>
                                         @endif
-                                        <a href="{{ route('videos.edit', $video) }}" class="text-gray-600 hover:text-gray-800 text-sm">
-                                            Edit
-                                        </a>
-                                        <button onclick="deleteVideo({{ $video->id }})" class="text-red-600 hover:text-red-800 text-sm">
-                                            Delete
-                                        </button>
+                                        
+                                        @if(auth()->user()->isAdmin())
+                                            <a href="{{ route('admin.videos.edit', $video) }}" class="text-gray-600 hover:text-gray-800 text-sm">
+                                                Edit
+                                            </a>
+                                            <button onclick="deleteVideo({{ $video->id }})" class="text-red-600 hover:text-red-800 text-sm">
+                                                Delete
+                                            </button>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
@@ -114,7 +121,7 @@
 <script>
 function deleteVideo(videoId) {
     if (confirm('Are you sure you want to delete this video? This action cannot be undone.')) {
-        fetch(`/videos/${videoId}`, {
+        fetch(`/admin/videos/${videoId}`, {
             method: 'DELETE',
             headers: {
                 'X-CSRF-TOKEN': window.csrfToken,
