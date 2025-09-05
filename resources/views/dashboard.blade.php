@@ -8,6 +8,26 @@
                 <h2 class="text-2xl font-bold mb-6">Dashboard</h2>
                 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    @php
+                        if (auth()->user()->isAdmin()) {
+                            // Admins see their uploaded videos
+                            $totalVideos = auth()->user()->videos()->count();
+                            $completedVideos = auth()->user()->videos()->where('status', 'completed')->count();
+                            $processingVideos = auth()->user()->videos()->where('status', 'processing')->count();
+                        } else {
+                            // Regular users see videos they can watch
+                            $totalVideos = \App\Models\Video::whereHas('user', function($query) {
+                                $query->whereIn('role', ['admin', 'superadmin']);
+                            })->count();
+                            $completedVideos = \App\Models\Video::whereHas('user', function($query) {
+                                $query->whereIn('role', ['admin', 'superadmin']);
+                            })->where('status', 'completed')->count();
+                            $processingVideos = \App\Models\Video::whereHas('user', function($query) {
+                                $query->whereIn('role', ['admin', 'superadmin']);
+                            })->where('status', 'processing')->count();
+                        }
+                    @endphp
+                    
                     <div class="bg-blue-50 p-6 rounded-lg">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -16,8 +36,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Total Videos</h3>
-                                <p class="text-2xl font-bold text-blue-600">{{ auth()->user()->videos()->count() }}</p>
+                                <h3 class="text-lg font-medium text-gray-900">{{ auth()->user()->isAdmin() ? 'My Videos' : 'Available Videos' }}</h3>
+                                <p class="text-2xl font-bold text-blue-600">{{ $totalVideos }}</p>
                             </div>
                         </div>
                     </div>
@@ -30,8 +50,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Completed</h3>
-                                <p class="text-2xl font-bold text-green-600">{{ auth()->user()->videos()->where('status', 'completed')->count() }}</p>
+                                <h3 class="text-lg font-medium text-gray-900">Ready to Watch</h3>
+                                <p class="text-2xl font-bold text-green-600">{{ $completedVideos }}</p>
                             </div>
                         </div>
                     </div>
@@ -45,7 +65,7 @@
                             </div>
                             <div class="ml-4">
                                 <h3 class="text-lg font-medium text-gray-900">Processing</h3>
-                                <p class="text-2xl font-bold text-yellow-600">{{ auth()->user()->videos()->where('status', 'processing')->count() }}</p>
+                                <p class="text-2xl font-bold text-yellow-600">{{ $processingVideos }}</p>
                             </div>
                         </div>
                     </div>
@@ -56,7 +76,15 @@
                     <div class="bg-gray-50 p-6 rounded-lg">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Videos</h3>
                         @php
-                            $recentVideos = auth()->user()->videos()->latest()->take(5)->get();
+                            if (auth()->user()->isAdmin()) {
+                                // Admins see their uploaded videos
+                                $recentVideos = auth()->user()->videos()->latest()->take(5)->get();
+                            } else {
+                                // Regular users see videos uploaded by admins
+                                $recentVideos = \App\Models\Video::whereHas('user', function($query) {
+                                    $query->whereIn('role', ['admin', 'superadmin']);
+                                })->latest()->take(5)->get();
+                            }
                         @endphp
                         
                         @if($recentVideos->count() > 0)
