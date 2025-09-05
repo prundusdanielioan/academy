@@ -36,7 +36,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">{{ auth()->user()->isAdmin() ? 'My Videos' : 'Available Videos' }}</h3>
+                                <h3 class="text-lg font-medium text-gray-900">{{ auth()->user()->isAdmin() ? 'My Videos' : 'Total Videos' }}</h3>
                                 <p class="text-2xl font-bold text-blue-600">{{ $totalVideos }}</p>
                             </div>
                         </div>
@@ -50,7 +50,7 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Ready to Watch</h3>
+                                <h3 class="text-lg font-medium text-gray-900">{{ auth()->user()->isAdmin() ? 'Ready to Watch' : 'Available Now' }}</h3>
                                 <p class="text-2xl font-bold text-green-600">{{ $completedVideos }}</p>
                             </div>
                         </div>
@@ -150,7 +150,8 @@
                         </div>
                     </div>
                     
-                    <!-- Watch Progress -->
+                    <!-- Watch Progress (only for regular users) -->
+                    @if(!auth()->user()->isAdmin())
                     <div class="bg-gray-50 p-6 rounded-lg">
                         <h3 class="text-lg font-medium text-gray-900 mb-4">Watch Progress</h3>
                         @php
@@ -197,6 +198,7 @@
                             </a>
                         </div>
                     </div>
+                    @endif
                 </div>
                 
                 @if(auth()->user()->isAdmin())
