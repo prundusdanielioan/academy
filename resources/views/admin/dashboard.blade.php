@@ -33,14 +33,14 @@
                 <!-- Quick Actions -->
                 <div class="mb-8">
                     <h2 class="text-xl font-semibold mb-4">Quick Actions</h2>
-                    <div class="flex space-x-4">
+                    <div class="flex space-x-4 flex-wrap">
                         <a href="/admin/users" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                             Manage Users
                         </a>
                         <a href="/admin/videos" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             Manage Videos
                         </a>
-                        <a href="{{ route('admin.categories.index') }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                        <a href="{{ route('admin.categories.index') }}" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" style="display: inline-block; visibility: visible; opacity: 1;">
                             Manage Categories
                         </a>
                         <a href="{{ route('admin.videos.create') }}" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
