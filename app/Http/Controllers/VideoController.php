@@ -289,9 +289,22 @@ class VideoController extends Controller
     }
 
     /**
-     * Get user's video progress.
+     * Get user's video progress (view).
      */
-    public function progress(): JsonResponse
+    public function progress()
+    {
+        $progress = Auth::user()->videoProgress()
+            ->with('video')
+            ->orderBy('last_watched_at', 'desc')
+            ->get();
+
+        return view('progress.index', compact('progress'));
+    }
+
+    /**
+     * Get user's video progress (API).
+     */
+    public function progressApi(): JsonResponse
     {
         $progress = Auth::user()->videoProgress()
             ->with('video')

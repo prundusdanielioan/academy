@@ -16,6 +16,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('videos/{video}/progress', [VideoController::class, 'updateProgress'])->name('videos.progress');
     Route::get('videos/{video}/status', [VideoController::class, 'status'])->name('videos.status');
     Route::get('progress', [VideoController::class, 'progress'])->name('videos.user-progress');
+    Route::get('api/progress', [VideoController::class, 'progressApi'])->name('videos.user-progress-api');
     
     // Dashboard
     Route::get('/dashboard', function () {
