@@ -56,6 +56,7 @@
                         </div>
                     </div>
                     
+                    @if(auth()->user()->isAdmin())
                     <div class="bg-yellow-50 p-6 rounded-lg">
                         <div class="flex items-center">
                             <div class="flex-shrink-0">
@@ -69,6 +70,21 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                    <div class="bg-purple-50 p-6 rounded-lg">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0">
+                                <svg class="h-8 w-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Watched</h3>
+                                <p class="text-2xl font-bold text-purple-600">{{ auth()->user()->videoProgress()->where('is_completed', true)->count() }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
                 </div>
                 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
