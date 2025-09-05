@@ -119,12 +119,19 @@ class VideoController extends Controller
      */
     public function show(Video $video)
     {
-        // Check if user owns the video or has permission to view it
-        if ($video->user_id !== Auth::id()) {
-            abort(403);
+        // Load the video with its user relationship
+        $video->load('user', 'progress');
+        
+        // Check permissions based on user role
+        if (Auth::user()->isAdmin()) {
+            // Admins can view all videos
+        } else {
+            // Regular users can only view videos uploaded by admins
+            if (!in_array($video->user->role, ['admin', 'superadmin'])) {
+                abort(403, 'Access denied. You can only view videos uploaded by administrators.');
+            }
         }
 
-        $video->load('progress');
         $userProgress = $video->getUserProgress(Auth::id());
 
         return view('videos.show', compact('video', 'userProgress'));
