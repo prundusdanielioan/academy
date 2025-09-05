@@ -108,7 +108,11 @@
                                         </div>
                                         <div class="flex items-center space-x-2">
                                             <span class="status-badge status-{{ $video->status }}">
-                                                {{ ucfirst($video->status) }}
+                                                @if(auth()->user()->isAdmin())
+                                                    {{ ucfirst($video->status) }}
+                                                @else
+                                                    {{ $video->status === 'completed' ? 'Ready' : ucfirst($video->status) }}
+                                                @endif
                                             </span>
                                             @if($video->isReady())
                                                 <a href="{{ route('videos.show', $video) }}" class="text-blue-600 hover:text-blue-800 text-sm">
