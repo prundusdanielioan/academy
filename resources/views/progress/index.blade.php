@@ -1,9 +1,11 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            {{ __('My Video Progress') }}
-        </h2>
-    </x-slot>
+@extends('layouts.app')
+
+@section('content')
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900">My Video Progress</h1>
+        <p class="text-gray-600 mt-2">Track your learning progress across all videos</p>
+    </div>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -86,4 +88,5 @@
             </div>
         </div>
     </div>
-</x-app-layout>
+</div>
+@endsection
