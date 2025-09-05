@@ -25,6 +25,7 @@ class Video extends Model
         'status',
         'processing_log',
         'user_id',
+        'category_id',
     ];
 
     protected $casts = [
@@ -37,6 +38,14 @@ class Video extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the category that the video belongs to.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     /**

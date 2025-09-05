@@ -70,6 +70,7 @@ class VideoController extends Controller
         $validator = Validator::make($request->all(), [
             'title' => 'required|string|max:255',
             'description' => 'nullable|string|max:1000',
+            'category_id' => 'required|exists:categories,id',
             'video' => 'required|file|mimes:mp4,avi,mov,wmv,flv,webm|max:102400', // 100MB max
         ]);
 
@@ -89,6 +90,7 @@ class VideoController extends Controller
             $video = Video::create([
                 'title' => $request->title,
                 'description' => $request->description,
+                'category_id' => $request->category_id,
                 'original_filename' => $file->getClientOriginalName(),
                 'original_path' => $path,
                 'user_id' => Auth::id(),
