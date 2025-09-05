@@ -40,7 +40,7 @@
                         <a href="/admin/videos" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             Manage Videos
                         </a>
-                        <a href="{{ route('admin.categories.index') }}" class="bg-orange-500 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded" style="display: inline-block; visibility: visible; opacity: 1;">
+                        <a href="{{ route('admin.categories.index') }}" style="background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block; visibility: visible; opacity: 1; margin-right: 16px;">
                             Manage Categories
                         </a>
                         <a href="{{ route('admin.videos.create') }}" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
