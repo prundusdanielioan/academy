@@ -80,7 +80,7 @@ document.getElementById('editForm').addEventListener('submit', function(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Updating...';
     
-    fetch('{{ route("videos.update", $video) }}', {
+    fetch('{{ route("admin.videos.update", $video) }}', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
