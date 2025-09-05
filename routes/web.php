@@ -41,6 +41,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/videos/{video}/edit', [VideoController::class, 'edit'])->name('videos.edit');
     Route::put('/videos/{video}', [VideoController::class, 'update'])->name('videos.update');
     Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
+    
+    // Category management routes
+    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
 });
 
 require __DIR__.'/auth.php';

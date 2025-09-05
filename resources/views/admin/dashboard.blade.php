@@ -40,6 +40,9 @@
                         <a href="{{ route('admin.videos') }}" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             Manage Videos
                         </a>
+                        <a href="{{ route('admin.categories.index') }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
+                            Manage Categories
+                        </a>
                         <a href="{{ route('admin.videos.create') }}" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                             Upload Video
                         </a>
