@@ -3,6 +3,7 @@
 use App\Http\Controllers\VideoController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -17,6 +18,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('videos/{video}/status', [VideoController::class, 'status'])->name('videos.status');
     Route::get('progress', [VideoController::class, 'progress'])->name('videos.user-progress');
     Route::get('api/progress', [VideoController::class, 'progressApi'])->name('videos.user-progress-api');
+    
+    // Category browsing routes (all authenticated users)
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     
     // Dashboard
     Route::get('/dashboard', function () {
