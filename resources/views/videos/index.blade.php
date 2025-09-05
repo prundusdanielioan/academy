@@ -106,7 +106,7 @@
                         <h3 class="mt-2 text-sm font-medium text-gray-900">No videos</h3>
                         <p class="mt-1 text-sm text-gray-500">Get started by uploading your first video.</p>
                         <div class="mt-6">
-                            <a href="{{ route('videos.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            <a href="{{ route('admin.videos.create') }}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
                                 Upload Video
                             </a>
                         </div>
