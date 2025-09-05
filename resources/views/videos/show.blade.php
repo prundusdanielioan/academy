@@ -14,9 +14,11 @@
                             @endif
                         </div>
                         <div class="flex space-x-2">
-                            <a href="{{ route('videos.edit', $video) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            @if(auth()->user()->isAdmin())
+                            <a href="{{ route('admin.videos.edit', $video) }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
                                 Edit
                             </a>
+                            @endif
                             <a href="{{ route('videos.index') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                                 Back to Videos
                             </a>
@@ -105,9 +107,11 @@
                             </svg>
                             <h3 class="text-lg font-medium text-gray-900 mb-2">Processing Failed</h3>
                             <p class="text-gray-600 mb-4">{{ $video->processing_log }}</p>
-                            <a href="{{ route('videos.edit', $video) }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            @if(auth()->user()->isAdmin())
+                            <a href="{{ route('admin.videos.edit', $video) }}" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
                                 Try Again
                             </a>
+                            @endif
                         @endif
                     </div>
                 @endif
