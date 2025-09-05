@@ -235,7 +235,7 @@ document.getElementById('uploadForm').addEventListener('submit', function(e) {
         resetForm();
     });
     
-    xhr.open('POST', '{{ route("videos.store") }}');
+    xhr.open('POST', '{{ route("admin.videos.store") }}');
     xhr.send(formData);
 });
 
