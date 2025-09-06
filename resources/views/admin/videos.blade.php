@@ -18,7 +18,7 @@
                             <div class="flex items-center">
                                 <div class="flex-shrink-0 h-16 w-16">
                                     @if($video->thumbnail_path)
-                                        <img class="h-16 w-16 object-cover rounded" src="{{ Storage::disk('public')->url($video->thumbnail_path) }}" alt="{{ $video->title }}">
+                                        <img class="h-16 w-16 object-cover rounded" src="{{ \Storage::disk('public')->url($video->thumbnail_path) }}" alt="{{ $video->title }}">
                                     @else
                                         <div class="h-16 w-16 bg-gray-200 rounded flex items-center justify-center">
                                             <svg class="h-8 w-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
