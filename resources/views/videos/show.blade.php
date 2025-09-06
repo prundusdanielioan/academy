@@ -31,6 +31,7 @@
                         <video id="videoPlayer" class="video-player" controls preload="metadata">
                             Your browser does not support the video tag.
                         </video>
+                        <div id="transcodingMethod" style="display: none;">{{ env('VIDEO_TRANSCODING_METHOD', 'simple') }}</div>
                     </div>
 
                     <div class="mb-6">
@@ -127,16 +128,33 @@ let progressUpdateInterval = null;
 let lastProgressUpdate = 0;
 
 @if($video->isReady())
-// Initialize HLS player
+// Initialize video player based on transcoding method
 document.addEventListener('DOMContentLoaded', function() {
     const video = document.getElementById('videoPlayer');
-    const videoSrc = '{{ $video->hls_url }}';
+    const transcodingMethod = document.getElementById('transcodingMethod').textContent;
     
+    let videoSrc;
+    if (transcodingMethod === 'simple') {
+        videoSrc = '{{ $video->original_url }}';
+    } else {
+        videoSrc = '{{ $video->hls_url }}';
+    }
+    
+    console.log('Transcoding method:', transcodingMethod);
     console.log('Video element:', video);
     console.log('Video source:', videoSrc);
     console.log('HLS supported:', Hls.isSupported());
     
-    if (Hls.isSupported()) {
+    if (transcodingMethod === 'simple') {
+        // Simple MP4 streaming - no HLS needed
+        console.log('Using simple MP4 streaming');
+        video.src = videoSrc;
+        video.addEventListener('loadedmetadata', function() {
+            console.log('MP4 video loaded successfully');
+            startProgressTracking();
+        });
+    } else if (Hls.isSupported()) {
+        // HLS streaming
         console.log('Using HLS.js');
         hls = new Hls();
         hls.loadSource(videoSrc);

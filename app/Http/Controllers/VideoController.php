@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Video;
 use App\Models\VideoProgress;
 use App\Services\HlsTranscoderService;
+use App\Services\TranscodingManager;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -15,10 +16,12 @@ use Illuminate\Support\Facades\Validator;
 class VideoController extends Controller
 {
     protected $transcoderService;
+    protected $transcodingManager;
 
-    public function __construct(HlsTranscoderService $transcoderService)
+    public function __construct(HlsTranscoderService $transcoderService, TranscodingManager $transcodingManager)
     {
         $this->transcoderService = $transcoderService;
+        $this->transcodingManager = $transcodingManager;
     }
 
     /**
@@ -97,9 +100,9 @@ class VideoController extends Controller
                 'status' => 'uploading'
             ]);
 
-            // Start transcoding in background
+            // Start transcoding in background using the configured method
             dispatch(function () use ($video) {
-                $this->transcoderService->transcode($video);
+                $this->transcodingManager->process($video);
             })->afterResponse();
 
             return response()->json([

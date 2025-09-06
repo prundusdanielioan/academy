@@ -93,7 +93,39 @@ class Video extends Model
      */
     public function isReady(): bool
     {
-        return $this->status === 'completed' && $this->hls_path;
+        $transcodingMethod = env('VIDEO_TRANSCODING_METHOD', 'simple');
+        
+        switch ($transcodingMethod) {
+            case 'ffmpeg':
+            case 'external':
+                return $this->status === 'completed' && $this->hls_path;
+                
+            case 'client':
+                return $this->status === 'completed' && ($this->hls_path || $this->original_path);
+                
+            case 'simple':
+            default:
+                return $this->status === 'completed' && $this->original_path;
+        }
+    }
+    
+    /**
+     * Get the appropriate video URL based on transcoding method.
+     */
+    public function getVideoUrlAttribute(): ?string
+    {
+        $transcodingMethod = env('VIDEO_TRANSCODING_METHOD', 'simple');
+        
+        switch ($transcodingMethod) {
+            case 'ffmpeg':
+            case 'external':
+            case 'client':
+                return $this->hls_url ?: $this->original_url;
+                
+            case 'simple':
+            default:
+                return $this->original_url;
+        }
     }
 
     /**
