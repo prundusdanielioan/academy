@@ -46,17 +46,33 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             @foreach($videos as $video)
                 <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 overflow-hidden">
-                    <div class="aspect-video bg-gray-200">
-                        @if($video->thumbnail_path)
-                            <img class="w-full h-full object-cover" src="{{ Storage::disk('public')->url($video->thumbnail_path) }}" alt="{{ $video->title }}">
-                        @else
-                            <div class="w-full h-full flex items-center justify-center">
-                                <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
+                    <a href="{{ route('videos.show', $video) }}" class="block aspect-video bg-gray-200 hover:bg-gray-300 transition-colors duration-200 relative group">
+                        @if($video->thumbnail_path && $video->thumbnail_url)
+                            <img class="w-full h-full object-cover" src="{{ $video->thumbnail_url }}" alt="{{ $video->title }}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <!-- Play button overlay -->
+                            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                <div class="bg-black bg-opacity-50 rounded-full p-4">
+                                    <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </div>
                             </div>
                         @endif
-                    </div>
+                        <!-- Fallback for videos without thumbnails or broken images -->
+                        <div class="w-full h-full flex items-center justify-center relative" style="{{ $video->thumbnail_path && $video->thumbnail_url ? 'display: none;' : '' }}">
+                            <svg class="h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <!-- Play button for videos without thumbnails -->
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <div class="bg-blue-600 rounded-full p-4 shadow-lg">
+                                    <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M8 5v14l11-7z"/>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
                     
                     <div class="p-4">
                         <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">

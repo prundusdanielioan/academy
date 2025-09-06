@@ -77,7 +77,7 @@ class Video extends Model
             return null;
         }
 
-        return Storage::url($this->thumbnail_path);
+        return Storage::disk('public')->url($this->thumbnail_path);
     }
 
     /**

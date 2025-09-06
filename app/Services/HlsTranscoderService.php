@@ -100,10 +100,10 @@ class HlsTranscoderService
     private function generateThumbnail(string $videoPath, Video $video): string
     {
         $thumbnailPath = 'thumbnails/' . $video->id . '.jpg';
-        $thumbnailFullPath = Storage::path($thumbnailPath);
+        $thumbnailFullPath = Storage::disk('public')->path($thumbnailPath);
         
         // Create thumbnails directory
-        Storage::makeDirectory('thumbnails');
+        Storage::disk('public')->makeDirectory('thumbnails');
         
         // Extract thumbnail at 5 seconds
         $command = sprintf(
