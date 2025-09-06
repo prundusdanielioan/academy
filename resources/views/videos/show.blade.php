@@ -28,7 +28,7 @@
 
                 @if($video->isReady())
                     <div class="video-container mb-6">
-                        <video id="videoPlayer" class="video-player" controls>
+                        <video id="videoPlayer" class="video-player" controls preload="metadata">
                             Your browser does not support the video tag.
                         </video>
                     </div>
@@ -132,13 +132,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const video = document.getElementById('videoPlayer');
     const videoSrc = '{{ $video->hls_url }}';
     
+    console.log('Video element:', video);
+    console.log('Video source:', videoSrc);
+    console.log('HLS supported:', Hls.isSupported());
+    
     if (Hls.isSupported()) {
+        console.log('Using HLS.js');
         hls = new Hls();
         hls.loadSource(videoSrc);
         hls.attachMedia(video);
         
         hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            console.log('HLS manifest loaded');
+            console.log('HLS manifest loaded successfully');
             
             // Resume from last position if available
             @if($userProgress && $userProgress->current_time > 0)
@@ -150,17 +155,37 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         hls.on(Hls.Events.ERROR, function(event, data) {
-            console.error('HLS error:', data);
+            console.error('HLS error:', event, data);
+            if (data.fatal) {
+                switch(data.type) {
+                    case Hls.ErrorTypes.NETWORK_ERROR:
+                        console.log('Fatal network error encountered, try to recover');
+                        hls.startLoad();
+                        break;
+                    case Hls.ErrorTypes.MEDIA_ERROR:
+                        console.log('Fatal media error encountered, try to recover');
+                        hls.recoverMediaError();
+                        break;
+                    default:
+                        console.log('Fatal error, cannot recover');
+                        hls.destroy();
+                        break;
+                }
+            }
         });
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        console.log('Using native HLS support (Safari)');
         // Native HLS support (Safari)
         video.src = videoSrc;
         video.addEventListener('loadedmetadata', function() {
+            console.log('Native HLS metadata loaded');
             @if($userProgress && $userProgress->current_time > 0)
                 video.currentTime = {{ $userProgress->current_time }};
             @endif
             startProgressTracking();
         });
+    } else {
+        console.error('HLS not supported in this browser');
     }
 });
 
