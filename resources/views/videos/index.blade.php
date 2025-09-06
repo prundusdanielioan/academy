@@ -20,14 +20,37 @@
                     <div class="video-grid">
                         @foreach($videos as $video)
                             <div class="video-card">
+                                @if($video->isReady())
+                                    <a href="{{ route('videos.show', $video) }}" class="block">
+                                @endif
                                 <div class="relative">
                                     @if($video->thumbnail_url)
                                         <img src="{{ $video->thumbnail_url }}" alt="{{ $video->title }}" class="video-thumbnail">
+                                        @if($video->isReady())
+                                            <!-- Play button overlay -->
+                                            <div class="absolute inset-0 flex items-center justify-center">
+                                                <div class="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-4 shadow-lg transition-all duration-200">
+                                                    <svg class="h-8 w-8 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
+                                                        <path d="M8 5v14l11-7z"/>
+                                                    </svg>
+                                                </div>
+                                            </div>
+                                        @endif
                                     @else
                                         <div class="video-thumbnail flex items-center justify-center">
                                             <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                                             </svg>
+                                            @if($video->isReady())
+                                                <!-- Play button for videos without thumbnails -->
+                                                <div class="absolute inset-0 flex items-center justify-center">
+                                                    <div class="bg-blue-600 rounded-full p-4 shadow-lg">
+                                                        <svg class="h-8 w-8 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                                            <path d="M8 5v14l11-7z"/>
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            @endif
                                         </div>
                                     @endif
                                     
@@ -36,15 +59,10 @@
                                             {{ ucfirst($video->status) }}
                                         </span>
                                     </div>
-                                    
-                                    @if($video->isReady())
-                                        <div class="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-20 transition-all duration-200 flex items-center justify-center">
-                                            <a href="{{ route('videos.show', $video) }}" class="bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-800 px-4 py-2 rounded-lg font-medium transition-all duration-200">
-                                                Watch
-                                            </a>
-                                        </div>
-                                    @endif
                                 </div>
+                                @if($video->isReady())
+                                    </a>
+                                @endif
                                 
                                 <div class="video-info">
                                     <h3 class="video-title">{{ $video->title }}</h3>
