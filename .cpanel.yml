@@ -1,7 +1,7 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/prundusa/public_html
+    - export DEPLOYPATH=/home/prundusa/public_html/self-learn.ro
     - /bin/cp -r app $DEPLOYPATH/
     - /bin/cp -r bootstrap $DEPLOYPATH/
     - /bin/cp -r config $DEPLOYPATH/
