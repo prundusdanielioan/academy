@@ -1,0 +1,101 @@
+name: Deploy to cPanel
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, mysql, sqlite3
+        coverage: none
+        
+    - name: Copy environment file
+      run: cp .env.example .env
+      
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+      
+    - name: Generate application key
+      run: php artisan key:generate
+      
+    - name: Create deployment package
+      run: |
+        # Create a deployment package excluding unnecessary files
+        tar -czf deployment.tar.gz \
+          --exclude='.git' \
+          --exclude='.github' \
+          --exclude='node_modules' \
+          --exclude='tests' \
+          --exclude='.env' \
+          --exclude='*.md' \
+          --exclude='*.sh' \
+          --exclude='*.mp4' \
+          --exclude='phpunit.xml' \
+          --exclude='.cpanel.yml' \
+          .
+          
+    - name: Deploy to cPanel
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.CPANEL_HOST }}
+        username: ${{ secrets.CPANEL_USERNAME }}
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: 22
+        source: "deployment.tar.gz"
+        target: "/home/${{ secrets.CPANEL_USERNAME }}/"
+        strip_components: 0
+        
+    - name: Extract and setup on server
+      uses: appleboy/ssh-action@v1.0.0
+      with:
+        host: ${{ secrets.CPANEL_HOST }}
+        username: ${{ secrets.CPANEL_USERNAME }}
+        key: ${{ secrets.CPANEL_SSH_KEY }}
+        port: 22
+        script: |
+          cd /home/${{ secrets.CPANEL_USERNAME }}/public_html/self-learn.ro
+          
+          # Backup current deployment
+          if [ -d "app" ]; then
+            tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz app bootstrap config database public resources routes storage vendor artisan composer.json composer.lock .env
+          fi
+          
+          # Extract new deployment
+          tar -xzf /home/${{ secrets.CPANEL_USERNAME }}/deployment.tar.gz
+          
+          # Set proper permissions
+          chmod -R 755 storage
+          chmod -R 755 bootstrap/cache
+          
+          # Install dependencies
+          composer install --no-dev --optimize-autoloader --no-interaction
+          
+          # Generate application key if needed
+          if [ ! -f .env ]; then
+            cp .env.example .env
+            php artisan key:generate
+          fi
+          
+          # Run migrations
+          php artisan migrate --force
+          
+          # Cache configuration
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache
+          
+          # Clean up
+          rm /home/${{ secrets.CPANEL_USERNAME }}/deployment.tar.gz
+          
+          echo "Deployment completed successfully!"
