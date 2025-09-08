@@ -1,4 +1,4 @@
-name: Deploy to cPanel
+name: Deploy to cPanel (Simple)
 
 on:
   push:
@@ -20,45 +20,26 @@ jobs:
         extensions: mbstring, dom, fileinfo, mysql, sqlite3
         coverage: none
         
-    - name: Copy environment file
-      run: cp .env.example .env
-      
     - name: Install dependencies
       run: composer install --no-dev --optimize-autoloader --no-interaction
       
-    - name: Generate application key
-      run: php artisan key:generate
-      
-    - name: Create deployment package
+    - name: Build assets (if using Vite)
       run: |
-        # Create a deployment package excluding unnecessary files
-        mkdir -p /tmp/deployment
-        tar -czf /tmp/deployment/deployment.tar.gz \
-          --exclude='.git' \
-          --exclude='.github' \
-          --exclude='node_modules' \
-          --exclude='tests' \
-          --exclude='.env' \
-          --exclude='*.md' \
-          --exclude='*.sh' \
-          --exclude='*.mp4' \
-          --exclude='phpunit.xml' \
-          --exclude='.cpanel.yml' \
-          --exclude='deployment.tar.gz' \
-          .
-          
-    - name: Deploy to cPanel
+        npm ci
+        npm run build
+        
+    - name: Deploy via SCP (Direct copy)
       uses: appleboy/scp-action@v0.1.4
       with:
         host: ${{ secrets.CPANEL_HOST }}
         username: ${{ secrets.CPANEL_USERNAME }}
         key: ${{ secrets.CPANEL_SSH_KEY }}
         port: 22
-        source: "/tmp/deployment/deployment.tar.gz"
-        target: "/home/${{ secrets.CPANEL_USERNAME }}/"
+        source: "app,bootstrap,config,database,public,resources,routes,storage,vendor,artisan,composer.json,composer.lock,.env.example"
+        target: "/home/${{ secrets.CPANEL_USERNAME }}/public_html/self-learn.ro/"
         strip_components: 0
         
-    - name: Extract and setup on server
+    - name: Post-deployment setup
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.CPANEL_HOST }}
@@ -68,20 +49,9 @@ jobs:
         script: |
           cd /home/${{ secrets.CPANEL_USERNAME }}/public_html/self-learn.ro
           
-          # Backup current deployment
-          if [ -d "app" ]; then
-            tar -czf backup-$(date +%Y%m%d-%H%M%S).tar.gz app bootstrap config database public resources routes storage vendor artisan composer.json composer.lock .env
-          fi
-          
-          # Extract new deployment
-          tar -xzf /home/${{ secrets.CPANEL_USERNAME }}/deployment.tar.gz
-          
           # Set proper permissions
           chmod -R 755 storage
           chmod -R 755 bootstrap/cache
-          
-          # Install dependencies
-          composer install --no-dev --optimize-autoloader --no-interaction
           
           # Generate application key if needed
           if [ ! -f .env ]; then
@@ -96,8 +66,5 @@ jobs:
           php artisan config:cache
           php artisan route:cache
           php artisan view:cache
-          
-          # Clean up
-          rm /home/${{ secrets.CPANEL_USERNAME }}/deployment.tar.gz
           
           echo "Deployment completed successfully!"
