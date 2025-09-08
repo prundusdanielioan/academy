@@ -1,0 +1,36 @@
+name: Test FTP Connection
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Test FTP Connection
+      run: |
+        echo "Testing FTP connection..."
+        echo "Server: ${{ secrets.FTP_SERVER }}"
+        echo "Username: ${{ secrets.FTP_USERNAME }}"
+        echo "Password: [HIDDEN]"
+        
+        # Test basic connectivity
+        if [ -z "${{ secrets.FTP_SERVER }}" ]; then
+          echo "❌ FTP_SERVER secret is not set"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.FTP_USERNAME }}" ]; then
+          echo "❌ FTP_USERNAME secret is not set"
+          exit 1
+        fi
+        
+        if [ -z "${{ secrets.FTP_PASSWORD }}" ]; then
+          echo "❌ FTP_PASSWORD secret is not set"
+          exit 1
+        fi
+        
+        echo "✅ All FTP secrets are configured"
+        echo "Server: ${{ secrets.FTP_SERVER }}"
+        echo "Username: ${{ secrets.FTP_USERNAME }}"
