@@ -1,0 +1,110 @@
+name: Deploy to cPanel via FTP (Complete)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, mysql, sqlite3
+        coverage: none
+        
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+      
+    - name: Build assets (if using Vite)
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Prepare production environment
+      run: |
+        # Create production .env
+        cp .env.example .env
+        sed -i 's/APP_ENV=local/APP_ENV=production/' .env
+        sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env
+        sed -i 's|APP_URL=http://lms.local:8000|APP_URL=https://self-learn.ro|' .env
+        sed -i 's|ASSET_URL=http://lms.local:8000|ASSET_URL=https://self-learn.ro|' .env
+        sed -i 's/FORCE_HTTPS=false/FORCE_HTTPS=true/' .env
+        
+        # Generate application key
+        php artisan key:generate
+        
+        # Create storage symlink
+        php artisan storage:link
+        
+        # Cache configuration
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache
+        
+    - name: Deploy via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/self-learn.ro/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.github/**
+          **/tests/**
+          **/*.md
+          **/*.sh
+          **/*.mp4
+          **/phpunit.xml
+          **/.cpanel.yml
+          **/.env.example
+          
+    - name: Create post-deployment script
+      run: |
+        cat > post-deploy.php << 'EOF'
+        <?php
+        // Post-deployment script to run on server
+        echo "Starting post-deployment setup...\n";
+        
+        // Set proper permissions
+        system('chmod -R 755 storage');
+        system('chmod -R 755 bootstrap/cache');
+        
+        // Run migrations
+        system('php artisan migrate --force');
+        
+        // Clear and cache configuration
+        system('php artisan config:clear');
+        system('php artisan config:cache');
+        system('php artisan route:cache');
+        system('php artisan view:cache');
+        
+        echo "Post-deployment setup completed!\n";
+        ?>
+        EOF
+        
+    - name: Upload post-deployment script
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/self-learn.ro/
+        local-dir: ./
+        include: post-deploy.php
+        
+    - name: Run post-deployment via FTP
+      run: |
+        echo "Deployment completed! Please run the following command on your server:"
+        echo "cd /home/${{ secrets.FTP_USERNAME }}/public_html/self-learn.ro && php post-deploy.php"
+        echo "Or access your cPanel File Manager and run post-deploy.php"
