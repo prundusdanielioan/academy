@@ -1,0 +1,72 @@
+name: Deploy to cPanel via FTP Only (Simple)
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+        extensions: mbstring, dom, fileinfo, mysql, sqlite3
+        coverage: none
+        
+    - name: Install dependencies
+      run: composer install --no-dev --optimize-autoloader --no-interaction
+      
+    - name: Build assets
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Create .env file for production
+      run: |
+        cp .env.example .env
+        # Update production settings
+        sed -i 's/APP_ENV=local/APP_ENV=production/' .env
+        sed -i 's/APP_DEBUG=true/APP_DEBUG=false/' .env
+        sed -i 's|APP_URL=http://lms.local:8000|APP_URL=https://self-learn.ro|' .env
+        sed -i 's|ASSET_URL=http://lms.local:8000|ASSET_URL=https://self-learn.ro|' .env
+        sed -i 's/FORCE_HTTPS=false/FORCE_HTTPS=true/' .env
+        
+    - name: Deploy via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: /public_html/self-learn.ro/
+        exclude: |
+          **/.git*
+          **/.git*/**
+          **/node_modules/**
+          **/.github/**
+          **/tests/**
+          **/*.md
+          **/*.sh
+          **/*.mp4
+          **/phpunit.xml
+          **/.env.example
+          
+    - name: Deployment Complete
+      run: |
+        echo "🎉 Deployment completed successfully!"
+        echo "📋 Next steps:"
+        echo "1. Check your website: https://self-learn.ro"
+        echo "2. Access cPanel to run Laravel commands:"
+        echo "   - php artisan migrate --force"
+        echo "   - php artisan config:cache"
+        echo "   - php artisan route:cache"
+        echo "   - php artisan view:cache"
+        echo "3. Set proper permissions:"
+        echo "   - chmod -R 755 storage"
+        echo "   - chmod -R 755 bootstrap/cache"
