@@ -1,31 +1,38 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false }" class="bg-white shadow-sm" style="border-bottom: 1px solid var(--border-color); position: sticky; top: 0; z-index: 50;">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
-            <div class="flex">
+            <div class="flex items-center">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                    <a href="{{ route('dashboard') }}" class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-graduation-cap text-white text-lg"></i>
+                        </div>
+                        <span class="text-xl font-bold" style="color: var(--text-primary);">LMS Platform</span>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
                 @auth
-                <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                <div class="hidden space-x-1 sm:-my-px sm:ml-10 sm:flex">
+                    <a href="{{ route('dashboard') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('dashboard') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('dashboard') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
+                        <i class="fas fa-home mr-2"></i>
                         {{ __('Dashboard') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('videos.index')" :active="request()->routeIs('videos.*')">
+                    </a>
+                    <a href="{{ route('videos.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('videos.*') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('videos.*') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
+                        <i class="fas fa-play-circle mr-2"></i>
                         {{ __('Videos') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
+                    </a>
+                    <a href="{{ route('categories.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('categories.*') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('categories.*') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
+                        <i class="fas fa-folder mr-2"></i>
                         {{ __('Categories') }}
-                    </x-nav-link>
+                    </a>
                     @if(auth()->user()->isAdmin())
-                    <x-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">
+                    <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.*') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('admin.*') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
+                        <i class="fas fa-cog mr-2"></i>
                         {{ __('Admin') }}
-                    </x-nav-link>
+                    </a>
                     @endif
                 </div>
                 @endauth
@@ -36,50 +43,68 @@
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
-                        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
-                            <div>{{ auth()->user()->name }}</div>
-
-                            <div class="ml-1">
-                                <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
+                        <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl transition-all duration-200 hover:shadow-md" style="background: var(--background-color); color: var(--text-primary); border: 1px solid var(--border-color);">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">
+                                {{ substr(auth()->user()->name, 0, 1) }}
+                            </div>
+                            <div class="text-left">
+                                <div class="font-medium">{{ auth()->user()->name }}</div>
+                                <div class="text-xs opacity-75">{{ ucfirst(auth()->user()->role) }}</div>
+                            </div>
+                            <div class="ml-2">
+                                <i class="fas fa-chevron-down text-xs"></i>
                             </div>
                         </button>
                     </x-slot>
 
                     <x-slot name="content">
-                        <div class="px-4 py-2 text-xs text-gray-500">
-                            Role: {{ ucfirst(auth()->user()->role) }}
+                        <div class="px-4 py-3 border-b" style="border-color: var(--border-color);">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                </div>
+                                <div>
+                                    <div class="font-medium" style="color: var(--text-primary);">{{ auth()->user()->name }}</div>
+                                    <div class="text-sm" style="color: var(--text-secondary);">{{ auth()->user()->email }}</div>
+                                </div>
+                            </div>
                         </div>
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
-                        </x-dropdown-link>
-                        @if(auth()->user()->isAdmin())
-                        <x-dropdown-link :href="route('admin.dashboard')">
-                            {{ __('Admin Panel') }}
-                        </x-dropdown-link>
-                        @endif
-
-                        <!-- Authentication -->
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-
-                            <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                        <div class="py-2">
+                            <x-dropdown-link :href="route('profile.edit')" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50">
+                                <i class="fas fa-user mr-3 text-gray-400"></i>
+                                {{ __('Profile') }}
                             </x-dropdown-link>
-                        </form>
+                            @if(auth()->user()->isAdmin())
+                            <x-dropdown-link :href="route('admin.dashboard')" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50">
+                                <i class="fas fa-cog mr-3 text-gray-400"></i>
+                                {{ __('Admin Panel') }}
+                            </x-dropdown-link>
+                            @endif
+                        </div>
+                        <div class="border-t py-2" style="border-color: var(--border-color);">
+                            <form method="POST" action="{{ route('logout') }}">
+                                @csrf
+                                <x-dropdown-link :href="route('logout')"
+                                        onclick="event.preventDefault();
+                                                    this.closest('form').submit();"
+                                        class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 text-red-600">
+                                    <i class="fas fa-sign-out-alt mr-3"></i>
+                                    {{ __('Log Out') }}
+                                </x-dropdown-link>
+                            </form>
+                        </div>
                     </x-slot>
                 </x-dropdown>
             </div>
             @else
             <!-- Guest Navigation -->
-            <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-4">
-                <a href="{{ route('login') }}" class="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium">
+            <div class="hidden sm:flex sm:items-center sm:ml-6 space-x-3">
+                <a href="{{ route('login') }}" class="btn-secondary">
+                    <i class="fas fa-sign-in-alt"></i>
                     {{ __('Log in') }}
                 </a>
-                <a href="{{ route('register') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-md text-sm font-medium">
+                <a href="{{ route('register') }}" class="btn-primary">
+                    <i class="fas fa-user-plus"></i>
                     {{ __('Register') }}
                 </a>
             </div>
