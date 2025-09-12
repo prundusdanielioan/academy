@@ -38,6 +38,48 @@ jobs:
         sed -i 's|ASSET_URL=http://lms.local:8000|ASSET_URL=https://self-learn.ro|' .env
         sed -i 's/FORCE_HTTPS=false/FORCE_HTTPS=true/' .env
         
+    - name: Create setup script for Laravel commands
+      run: |
+        cat > setup.php << 'EOF'
+        <?php
+        // Laravel Setup Script
+        echo "<h2>Laravel Setup</h2>";
+        
+        // Check if we're in the right directory
+        if (!file_exists('artisan')) {
+            echo "❌ Not in Laravel directory!";
+            exit;
+        }
+        
+        echo "✅ In Laravel directory<br>";
+        
+        // Run commands
+        $commands = [
+            'php artisan migrate --force',
+            'php artisan config:cache',
+            'php artisan route:cache',
+            'php artisan view:cache'
+        ];
+        
+        foreach ($commands as $command) {
+            echo "<br>Running: $command<br>";
+            $output = shell_exec($command . ' 2>&1');
+            echo "<pre>$output</pre>";
+        }
+        
+        // Set permissions
+        echo "<br>Setting permissions...<br>";
+        exec('chmod -R 755 storage 2>&1', $output);
+        echo "<pre>" . implode("\n", $output) . "</pre>";
+        
+        exec('chmod -R 755 bootstrap/cache 2>&1', $output);
+        echo "<pre>" . implode("\n", $output) . "</pre>";
+        
+        echo "<br>✅ Setup complete!";
+        echo "<br><br><strong>IMPORTANT:</strong> Delete this file after running!";
+        ?>
+        EOF
+        
     - name: Deploy via FTP
       uses: SamKirkland/FTP-Deploy-Action@v4.3.4
       with:
@@ -61,12 +103,7 @@ jobs:
       run: |
         echo "🎉 Deployment completed successfully!"
         echo "📋 Next steps:"
-        echo "1. Check your website: https://self-learn.ro"
-        echo "2. Access cPanel to run Laravel commands:"
-        echo "   - php artisan migrate --force"
-        echo "   - php artisan config:cache"
-        echo "   - php artisan route:cache"
-        echo "   - php artisan view:cache"
-        echo "3. Set proper permissions:"
-        echo "   - chmod -R 755 storage"
-        echo "   - chmod -R 755 bootstrap/cache"
+        echo "1. Go to https://self-learn.ro/setup.php"
+        echo "2. Run the Laravel setup commands"
+        echo "3. Delete the setup.php file"
+        echo "4. Test your site at https://self-learn.ro"
