@@ -44,7 +44,7 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: /public_html/self-learn.ro/
+        server-dir: /home/prundusa/public_html/self-learn.ro/
         exclude: |
           **/.git*
           **/.git*/**
