@@ -28,6 +28,10 @@
                         <i class="fas fa-folder mr-2"></i>
                         {{ __('Categories') }}
                     </a>
+                    <a href="{{ route('pdfs.index') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('pdfs.*') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('pdfs.*') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
+                        <i class="fas fa-file-pdf mr-2"></i>
+                        {{ __('PDFs') }}
+                    </a>
                     @if(auth()->user()->isAdmin())
                     <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.*') ? 'text-white' : 'text-gray-600 hover:text-gray-900' }}" style="{{ request()->routeIs('admin.*') ? 'background: linear-gradient(135deg, var(--primary-color), var(--primary-hover));' : '' }}">
                         <i class="fas fa-cog mr-2"></i>
@@ -134,6 +138,9 @@
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('categories.index')" :active="request()->routeIs('categories.*')">
                 {{ __('Categories') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('pdfs.index')" :active="request()->routeIs('pdfs.*')">
+                {{ __('PDFs') }}
             </x-responsive-nav-link>
             @if(auth()->user()->isAdmin())
             <x-responsive-nav-link :href="route('admin.dashboard')" :active="request()->routeIs('admin.*')">

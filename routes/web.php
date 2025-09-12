@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\VideoController;
+use App\Http\Controllers\PdfController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoryController;
@@ -28,6 +29,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
     Route::get('categories/{category}', [CategoryController::class, 'show'])->name('categories.show');
     
+    // PDF viewing routes (all authenticated users)
+    Route::get('pdfs', [PdfController::class, 'index'])->name('pdfs.index');
+    Route::get('pdfs/{pdf}', [PdfController::class, 'show'])->name('pdfs.show');
+    Route::get('pdfs/{pdf}/download', [PdfController::class, 'download'])->name('pdfs.download');
+    Route::get('pdfs/{pdf}/view', [PdfController::class, 'view'])->name('pdfs.view');
+    
     // Dashboard
     Route::get('/dashboard', function () {
         return view('dashboard');
@@ -44,6 +51,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/users', [AdminController::class, 'users'])->name('users');
     Route::get('/videos', [AdminController::class, 'allVideos'])->name('videos');
+    Route::get('/pdfs', [AdminController::class, 'allPdfs'])->name('pdfs');
     
     // Admin-only video management routes
     Route::get('/videos/create', [VideoController::class, 'create'])->name('videos.create');
@@ -51,6 +59,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/videos/{video}/edit', [VideoController::class, 'edit'])->name('videos.edit');
     Route::put('/videos/{video}', [VideoController::class, 'update'])->name('videos.update');
     Route::delete('/videos/{video}', [VideoController::class, 'destroy'])->name('videos.destroy');
+    
+    // Admin-only PDF management routes
+    Route::get('/pdfs/create', [PdfController::class, 'create'])->name('pdfs.create');
+    Route::post('/pdfs', [PdfController::class, 'store'])->name('pdfs.store');
+    Route::get('/pdfs/{pdf}/edit', [PdfController::class, 'edit'])->name('pdfs.edit');
+    Route::put('/pdfs/{pdf}', [PdfController::class, 'update'])->name('pdfs.update');
+    Route::delete('/pdfs/{pdf}', [PdfController::class, 'destroy'])->name('pdfs.destroy');
     
     // Category management routes
     Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);

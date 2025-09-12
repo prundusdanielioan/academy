@@ -8,7 +8,7 @@
                 <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
                 
                 <!-- Statistics Cards -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
                     <div class="bg-blue-100 p-6 rounded-lg">
                         <h3 class="text-lg font-semibold text-blue-800">Total Users</h3>
                         <p class="text-3xl font-bold text-blue-600">{{ $stats['total_users'] }}</p>
@@ -17,6 +17,11 @@
                     <div class="bg-green-100 p-6 rounded-lg">
                         <h3 class="text-lg font-semibold text-green-800">Total Videos</h3>
                         <p class="text-3xl font-bold text-green-600">{{ $stats['total_videos'] }}</p>
+                    </div>
+                    
+                    <div class="bg-red-100 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold text-red-800">Total PDFs</h3>
+                        <p class="text-3xl font-bold text-red-600">{{ $stats['total_pdfs'] }}</p>
                     </div>
                     
                     <div class="bg-purple-100 p-6 rounded-lg">
@@ -40,17 +45,23 @@
                         <a href="/admin/videos" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                             Manage Videos
                         </a>
+                        <a href="/admin/pdfs" class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+                            Manage PDFs
+                        </a>
                         <a href="{{ route('admin.categories.index') }}" style="background-color: #dc2626; color: white; font-weight: bold; padding: 8px 16px; border-radius: 4px; text-decoration: none; display: inline-block; visibility: visible; opacity: 1; margin-right: 16px;">
                             Manage Categories
                         </a>
                         <a href="{{ route('admin.videos.create') }}" class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
                             Upload Video
                         </a>
+                        <a href="{{ route('admin.pdfs.create') }}" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                            Upload PDF
+                        </a>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <!-- Recent Users -->
                     <div class="bg-gray-50 p-6 rounded-lg">
                         <h3 class="text-lg font-semibold mb-4">Recent Users</h3>
@@ -99,6 +110,32 @@
                             </div>
                         @else
                             <p class="text-gray-500">No videos found.</p>
+                        @endif
+                    </div>
+
+                    <!-- Recent PDFs -->
+                    <div class="bg-gray-50 p-6 rounded-lg">
+                        <h3 class="text-lg font-semibold mb-4">Recent PDFs</h3>
+                        @if($stats['recent_pdfs']->count() > 0)
+                            <div class="space-y-3">
+                                @foreach($stats['recent_pdfs'] as $pdf)
+                                    <div class="flex justify-between items-center p-3 bg-white rounded border">
+                                        <div>
+                                            <p class="font-medium">{{ $pdf->title }}</p>
+                                            <p class="text-sm text-gray-600">by {{ $pdf->user->name ?? 'Unknown' }}</p>
+                                        </div>
+                                        <span class="px-2 py-1 text-xs rounded-full 
+                                            @if($pdf->status === 'completed') bg-green-100 text-green-800
+                                            @elseif($pdf->status === 'processing') bg-yellow-100 text-yellow-800
+                                            @elseif($pdf->status === 'failed') bg-red-100 text-red-800
+                                            @else bg-gray-100 text-gray-800 @endif">
+                                            {{ ucfirst($pdf->status) }}
+                                        </span>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <p class="text-gray-500">No PDFs found.</p>
                         @endif
                     </div>
                 </div>

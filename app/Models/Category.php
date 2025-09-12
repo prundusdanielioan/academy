@@ -34,6 +34,14 @@ class Category extends Model
     }
 
     /**
+     * Get the PDFs for the category.
+     */
+    public function pdfs(): HasMany
+    {
+        return $this->hasMany(Pdf::class);
+    }
+
+    /**
      * Boot the model.
      */
     protected static function boot()
