@@ -28,13 +28,18 @@ class GoogleController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
             
+            // Validate required data from Google
+            if (!$googleUser->getEmail() || !$googleUser->getId()) {
+                return redirect('/login')->with('error', 'Unable to retrieve user information from Google. Please try again.');
+            }
+            
             // Check if user already exists with this Google ID
             $user = User::where('google_id', $googleUser->getId())->first();
             
             if ($user) {
                 // User exists, log them in
                 Auth::login($user);
-                return redirect()->intended('/dashboard');
+                return redirect()->intended('/dashboard')->with('success', 'Welcome back!');
             }
             
             // Check if user exists with the same email
@@ -49,12 +54,12 @@ class GoogleController extends Controller
                 ]);
                 
                 Auth::login($existingUser);
-                return redirect()->intended('/dashboard');
+                return redirect()->intended('/dashboard')->with('success', 'Google account linked successfully!');
             }
             
             // Create new user
             $newUser = User::create([
-                'name' => $googleUser->getName(),
+                'name' => $googleUser->getName() ?: 'Google User',
                 'email' => $googleUser->getEmail(),
                 'google_id' => $googleUser->getId(),
                 'avatar' => $googleUser->getAvatar(),
@@ -64,10 +69,13 @@ class GoogleController extends Controller
             ]);
             
             Auth::login($newUser);
-            return redirect()->intended('/dashboard');
+            return redirect()->intended('/dashboard')->with('success', 'Account created successfully! Welcome to LMS Platform!');
             
+        } catch (\Laravel\Socialite\Two\InvalidStateException $e) {
+            return redirect('/login')->with('error', 'Session expired. Please try logging in again.');
         } catch (\Exception $e) {
-            return redirect('/login')->with('error', 'Something went wrong with Google authentication. Please try again.');
+            \Log::error('Google OAuth Error: ' . $e->getMessage());
+            return redirect('/login')->with('error', 'Something went wrong with Google authentication. Please try again or contact support if the problem persists.');
         }
     }
 }

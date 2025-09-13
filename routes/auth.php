@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
+use App\Http\Controllers\Auth\GoogleController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -14,6 +15,13 @@ Route::middleware('guest')->group(function () {
         ->name('login');
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
+
+    // Google OAuth routes
+    Route::get('auth/google', [GoogleController::class, 'redirectToGoogle'])
+        ->name('auth.google');
+    
+    Route::get('auth/google/callback', [GoogleController::class, 'handleGoogleCallback'])
+        ->name('auth.google.callback');
 });
 
 Route::middleware('auth')->group(function () {

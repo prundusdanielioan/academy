@@ -45,23 +45,21 @@
             <!-- Settings Dropdown -->
             @auth
             <div class="hidden sm:flex sm:items-center sm:ml-6">
-                <x-dropdown align="right" width="48">
-                    <x-slot name="trigger">
-                        <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl transition-all duration-200 hover:shadow-md" style="background: var(--background-color); color: var(--text-primary); border: 1px solid var(--border-color);">
-                            <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
-                            <div class="text-left">
-                                <div class="font-medium">{{ auth()->user()->name }}</div>
-                                <div class="text-xs opacity-75">{{ ucfirst(auth()->user()->role) }}</div>
-                            </div>
-                            <div class="ml-2">
-                                <i class="fas fa-chevron-down text-xs"></i>
-                            </div>
-                        </button>
-                    </x-slot>
+                <div class="relative" id="user-dropdown">
+                    <button onclick="toggleDropdown()" class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded-xl transition-all duration-200 hover:shadow-md" style="background: var(--background-color); color: var(--text-primary); border: 1px solid var(--border-color);">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold mr-3">
+                            {{ substr(auth()->user()->name, 0, 1) }}
+                        </div>
+                        <div class="text-left">
+                            <div class="font-medium">{{ auth()->user()->name }}</div>
+                            <div class="text-xs opacity-75">{{ ucfirst(auth()->user()->role) }}</div>
+                        </div>
+                        <div class="ml-2">
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </div>
+                    </button>
 
-                    <x-slot name="content">
+                    <div id="dropdown-menu" class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 z-50" style="display: none;">
                         <div class="px-4 py-3 border-b" style="border-color: var(--border-color);">
                             <div class="flex items-center space-x-3">
                                 <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
@@ -74,31 +72,28 @@
                             </div>
                         </div>
                         <div class="py-2">
-                            <x-dropdown-link :href="route('profile.edit')" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50">
+                            <a href="{{ route('profile.edit') }}" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-200">
                                 <i class="fas fa-user mr-3 text-gray-400"></i>
                                 {{ __('Profile') }}
-                            </x-dropdown-link>
+                            </a>
                             @if(auth()->user()->isAdmin())
-                            <x-dropdown-link :href="route('admin.dashboard')" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50">
+                            <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 transition-colors duration-200">
                                 <i class="fas fa-cog mr-3 text-gray-400"></i>
                                 {{ __('Admin Panel') }}
-                            </x-dropdown-link>
+                            </a>
                             @endif
                         </div>
                         <div class="border-t py-2" style="border-color: var(--border-color);">
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                                <x-dropdown-link :href="route('logout')"
-                                        onclick="event.preventDefault();
-                                                    this.closest('form').submit();"
-                                        class="flex items-center px-4 py-2 text-sm hover:bg-gray-50 text-red-600">
+                                <button type="submit" class="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-50 text-red-600 transition-colors duration-200">
                                     <i class="fas fa-sign-out-alt mr-3"></i>
                                     {{ __('Log Out') }}
-                                </x-dropdown-link>
+                                </button>
                             </form>
                         </div>
-                    </x-slot>
-                </x-dropdown>
+                    </div>
+                </div>
             </div>
             @else
             <!-- Guest Navigation -->
@@ -170,12 +165,10 @@
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-
-                    <x-responsive-nav-link :href="route('logout')"
-                            onclick="event.preventDefault();
-                                        this.closest('form').submit();">
+                    <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition-colors duration-200">
+                        <i class="fas fa-sign-out-alt mr-3"></i>
                         {{ __('Log Out') }}
-                    </x-responsive-nav-link>
+                    </button>
                 </form>
             </div>
         </div>
@@ -192,3 +185,26 @@
         @endauth
     </div>
 </nav>
+
+<script>
+function toggleDropdown() {
+    const dropdown = document.getElementById('dropdown-menu');
+    if (dropdown.style.display === 'none' || dropdown.style.display === '') {
+        dropdown.style.display = 'block';
+        console.log('Dropdown opened');
+    } else {
+        dropdown.style.display = 'none';
+        console.log('Dropdown closed');
+    }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('user-dropdown');
+    const menu = document.getElementById('dropdown-menu');
+    
+    if (dropdown && menu && !dropdown.contains(event.target)) {
+        menu.style.display = 'none';
+    }
+});
+</script>
