@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'LMS Platform') }}</title>
+    <title>{{ config('app.name', 'Self-Learn') }}</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -299,7 +299,7 @@
         <div class="nav-container">
             <a href="/" class="logo">
                 <i class="fas fa-graduation-cap mr-2"></i>
-                {{ config('app.name', 'LMS Platform') }}
+                {{ config('app.name', 'Self-Learn') }}
             </a>
             <div class="nav-links">
                 @if (app('router')->has('login'))
@@ -504,7 +504,7 @@
     <!-- Footer -->
     <footer class="py-8" style="background: var(--text-primary); color: white;">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; {{ date('Y') }} {{ config('app.name', 'LMS Platform') }}. All rights reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ config('app.name', 'Self-Learn') }}. All rights reserved.</p>
         </div>
     </footer>
 </body>

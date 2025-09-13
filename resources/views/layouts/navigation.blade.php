@@ -9,7 +9,7 @@
                         <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-800 rounded-xl flex items-center justify-center">
                             <i class="fas fa-graduation-cap text-white text-lg"></i>
                         </div>
-                        <span class="text-xl font-bold" style="color: var(--text-primary);">LMS Platform</span>
+                        <span class="text-xl font-bold" style="color: var(--text-primary);">{{ config('app.name', 'Self-Learn') }}</span>
                     </a>
                 </div>
 
