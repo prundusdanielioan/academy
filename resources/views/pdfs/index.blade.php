@@ -52,10 +52,15 @@
                         <input type="text" placeholder="Search PDFs..." class="pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: var(--border-color);">
                         <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
                     </div>
-                    <select class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: var(--border-color);">
-                        <option>All Categories</option>
-                        <option>Recent</option>
-                        <option>Most Downloaded</option>
+                    <select id="categoryFilter" class="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" style="border-color: var(--border-color);" onchange="filterByCategory()">
+                        <option value="" {{ request('category') == '' && request('sort') == '' ? 'selected' : '' }}>All Categories</option>
+                        <option value="recent" {{ request('sort') == 'recent' ? 'selected' : '' }}>Most Recent</option>
+                        <option value="most_downloaded" {{ request('sort') == 'most_downloaded' ? 'selected' : '' }}>Most Downloaded</option>
+                        @foreach($categories as $category)
+                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }} style="color: {{ $category->color }};">
+                                {{ $category->name }}
+                            </option>
+                        @endforeach
                     </select>
                 </div>
             </div>
@@ -205,6 +210,29 @@ function deletePdf(pdfId) {
             alert('An error occurred while deleting the PDF.');
         });
     }
+}
+
+function filterByCategory() {
+    const categoryId = document.getElementById('categoryFilter').value;
+    const currentUrl = new URL(window.location);
+    
+    if (categoryId) {
+        if (categoryId === 'recent') {
+            currentUrl.searchParams.set('sort', 'recent');
+            currentUrl.searchParams.delete('category');
+        } else if (categoryId === 'most_downloaded') {
+            currentUrl.searchParams.set('sort', 'most_downloaded');
+            currentUrl.searchParams.delete('category');
+        } else {
+            currentUrl.searchParams.set('category', categoryId);
+            currentUrl.searchParams.delete('sort');
+        }
+    } else {
+        currentUrl.searchParams.delete('category');
+        currentUrl.searchParams.delete('sort');
+    }
+    
+    window.location.href = currentUrl.toString();
 }
 </script>
 @endpush

@@ -14,15 +14,38 @@ class PdfController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $pdfs = Pdf::with(['user', 'category'])
+        $query = Pdf::with(['user', 'category'])
             ->public()
-            ->completed()
-            ->latest()
-            ->paginate(12);
+            ->completed();
 
-        return view('pdfs.index', compact('pdfs'));
+        // Handle category filtering
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Handle sorting
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'recent':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'most_downloaded':
+                    // For now, just sort by creation date since we don't have download tracking
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                default:
+                    $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $pdfs = $query->paginate(12);
+        $categories = Category::active()->ordered()->get();
+
+        return view('pdfs.index', compact('pdfs', 'categories'));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Video;
 use App\Models\VideoProgress;
+use App\Models\Category;
 use App\Services\HlsTranscoderService;
 use App\Services\TranscodingManager;
 use Illuminate\Http\Request;
@@ -27,24 +28,46 @@ class VideoController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = Video::with('progress', 'user', 'category');
+
         if (Auth::user()->isAdmin()) {
             // Admins see all videos
-            $videos = Video::with('progress', 'user')
-                ->orderBy('created_at', 'desc')
-                ->paginate(12);
         } else {
             // Regular users see only videos uploaded by admins
-            $videos = Video::with('progress', 'user')
-                ->whereHas('user', function($query) {
-                    $query->whereIn('role', ['admin', 'superadmin']);
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(12);
+            $query->whereHas('user', function($query) {
+                $query->whereIn('role', ['admin', 'superadmin']);
+            });
         }
 
-        return view('videos.index', compact('videos'));
+        // Handle category filtering
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Handle sorting
+        if ($request->filled('sort')) {
+            switch ($request->sort) {
+                case 'recent':
+                    $query->orderBy('created_at', 'desc');
+                    break;
+                case 'most_watched':
+                    $query->withCount('progress')
+                        ->orderBy('progress_count', 'desc')
+                        ->orderBy('created_at', 'desc');
+                    break;
+                default:
+                    $query->orderBy('created_at', 'desc');
+            }
+        } else {
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $videos = $query->paginate(12);
+        $categories = Category::active()->ordered()->get();
+
+        return view('videos.index', compact('videos', 'categories'));
     }
 
     /**
